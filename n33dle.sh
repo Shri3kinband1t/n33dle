@@ -35,6 +35,10 @@ function maint() {
   then
     apt-get update -qq
     apt-get upgrade -qq
+    cd /home/pi/scriptuse
+    rm -r n33dle
+    git clone https://github.com/shri3kinband1t/n33dle
+    mv n33dle/n33dle.sh /bin/x
   fi
   aircrack-ng
   if [ $? -eq 0 ]
@@ -89,24 +93,27 @@ else
   init
 fi }
 
+
 init
 
 function mainmenu(){
 echo -e "$Red"
 cat << "EOF"
 
-UUUU - Jam All Wifi and Monitor       LLLL - BT
-
-DDDD - Just Monitor                   RRRR - BT
-
-DUDU - Fake AP                        LRLR - BT
-
-UDUD - InteractiveHcker               RLRL - BT
-
-DDUU - who knows                      LLRR - BT
-
-DLRU - Maintenance                    RULD - Shutdown Now
-
+_   _  _____  _____     _ _
+| \ | ||____ ||____ |   | | |
+|  \| |    / /    / / __| | | ___
+| . ` |    \ \    \ \/ _` | |/ _ \
+| |\  |.___/ /.___/ / (_| | |  __/
+\_| \_/\____/ \____/ \__,_|_|\___|
+<< Use Unresponsibly! >>
+Github.com/shri3kinband1t/n33dle
+UUUU - Jam All Wifi and Monitor
+  DDDD - Just Monitor
+DUDU - Fake AP
+  DDUU - who knows
+DLRU - Maintenance
+  RULD - Shutdown Now
 EOF
 
 echo -e "$Black"
@@ -128,14 +135,16 @@ then
     read -t 60 -n 4 endcode
     if [ $endcode = "2121" ]
     then
-      end = "y"
+      systemctl stop deauther.service
+      systemctl stop mon.service
+      end="y"
+    else
+      runtime+=1
+      clear
     fi
-    runtime+=1
-    clear
   done
-
-
 fi
+
 if [ $menupick = "2341" ]
 then
   maint
@@ -144,6 +153,7 @@ if [ $menupick = "4132" ]
 then
   shutdown now
 fi
+
 mainmenu
 
 }
