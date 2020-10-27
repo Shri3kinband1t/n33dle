@@ -35,10 +35,13 @@ function maint() {
   then
     apt-get update -qq
     apt-get upgrade -qq
+    mkdir /home/pi/scriptuse
     cd /home/pi/scriptuse
     rm -r n33dle
     git clone https://github.com/shri3kinband1t/n33dle
     mv n33dle/n33dle.sh /bin/x
+    chmod 777 /bin/x
+
   fi
   aircrack-ng
   if [ $? -eq 0 ]
