@@ -1,35 +1,39 @@
 #!/bin/bash
+# n33dle is a framework for calling basic attacks.
 
-Red='\033[0;31m'
+#### Global Variables ####
+RED='\033[0;31m'
 NC='\033[0m'
-Green='\033[0;32m'
-Blue='\033[0;34m'
-Black='\033[0;30m'
-cdate= date -I
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+BLACK='\033[0;30m'
+TODAY=`date -I`
+
+#### Function Definition start ####
+
+# Ensure the script is running as root.
 function roottest() {
   ROOT_UID=0
   if [ "$UID" -eq "$ROOT_UID" ]
   then
-    echo -e "${Green}RootCheck Good${NC}"
+    echo -e "${GREEN}RootCheck Good${NC}"
   else
-    echo -e "${Red}ROOTFAIL${NC}"
+    echo -e "${RED}ROOTFAIL${NC}"
     exit 0
   fi }
-roottest
+
 function InternetTest() {
   if ping -q -c 1 -W 1 8.8.8.8 >/dev/null; then
-    echo -e "${Green}Internet Test Success${NC}"
+    echo -e "${GREEN}Internet Test Success${NC}"
     internet="y"
   else
-    echo -e "${Red}Internet Connection Unavailable${NC}"
+    echo -e "${RED}Internet Connection Unavailable${NC}"
     internet= "n"
   fi
 }
 
-
-
 function maint() {
-  echo -e "$Black"
+  echo -e "$BLACK"
   InternetTest
   if [ $internet="y" ]
   then
@@ -38,32 +42,32 @@ function maint() {
     mkdir /home/pi/scriptuse
     cd /home/pi/scriptuse
     rm -r n33dle
-    git clone https://github.com/shri3kinband1t/n33dle
-    mv n33dle/n33dle.sh /bin/x
+    git clone https://github.com/shri3kinband1t/n33dle # check to see if git exists first as a binary
+    mv n33dle/n33dle.sh /bin/x #dangerous - check to see if 'x' exists first
     chmod 777 /bin/x
 
   fi
-  aircrack-ng
+  aircrack-ng # safer to do a 'which aircrack-ng and look at the return code from that instead
   if [ $? -eq 0 ]
   then
     echo "Aircrack Found"
   else
-    echo -e "${Red}Aircrack-ng Not Installed${NC}"
+    echo -e "${RED}Aircrack-ng Not Installed${NC}"
     if [ $internet="y" ]; then
-      echo -e "${Red}Trying to install Aircrack-ng${NC}"
+      echo -e "${RED}Trying to install Aircrack-ng${NC}"
       apt-get install aircrack-ng -y
       if [ $? -eq 0 ]
       then
-        echo -e "${Green}Aircrack-ng Install Success!${NC}"
+        echo -e "${GREEN}Aircrack-ng Install Success!${NC}"
       fi
     fi
   fi
- echo -e "${Green}Maintenance Finished ${NC}"
+ echo -e "${GREEN}Maintenance Finished ${NC}"
 }
 
 function init() {
-echo -e "$Red"
-cat << "EOF"
+	echo -e "$RED"
+	cat << "EOF"
 
                  :::!~!!!!!:.
              .xUHWH!! !!?M88WHX:.
@@ -86,22 +90,20 @@ X$?!-~    : ?$$$B$Wu("**$RM!
 ~ !     :   ~$$$$$B$$en:`` [UUDD]
 ?x.~    :     ~"##*$$$$M~  to init
 EOF
-echo -e "$Black"
-read -t 45 -N 4 initcode
+	echo -e "$BLACK"
+	read -t 45 -N 4 initcode
 
-if [ $initcode = "1122" ]
-then
-  echo -e "$NC"
-else
-  init
-fi }
-
-
-init
+	if [ $initcode = "1122" ]
+	then
+  		echo -e "$NC"
+	else
+  		init
+	fi 
+}
 
 function mainmenu(){
-echo -e "$Red"
-cat << "EOF"
+	echo -e "$RED"
+	cat << "EOF"
 
 _   _  _____  _____     _ _
 | \ | ||____ ||____ |   | | |
@@ -119,46 +121,60 @@ DLRU - Maintenance
   RULD - Shutdown Now
 EOF
 
-echo -e "$Black"
-read -N 4 menupick
-echo -e "$NC"
+	echo -e "$BLACK"
+	read -N 4 menupick
+	echo -e "$NC"
 
-if [ $menupick = "1111" ]
-then
-  echo "starting"
-  systemctl start mon.service
-  systemctl start deauther.service
-  end="n"
-  declare -i runtime
-  runtime=0
-  while [ $end = "n" ]
-  do
-    echo "[DUDU] to end"
-    echo "Runtime = $runtime minutes"
-    read -t 60 -n 4 endcode
-    if [ $endcode = "2121" ]
-    then
-      systemctl stop deauther.service
-      systemctl stop mon.service
-      end="y"
-    else
-      runtime+=1
-      clear
-    fi
-  done
-fi
+	if [ $menupick = "1111" ]
+		then
+  			echo "starting"
+  			systemctl start mon.service
+  			systemctl start deauther.service
+  			end="n"
+  			declare -i runtime
+  			runtime=0
+  			while [ $end = "n" ]
+  				do
+    			echo "[DUDU] to end"
+    			echo "Runtime = $runtime minutes"
+    			read -t 60 -n 4 endcode
+    			if [ $endcode = "2121" ]
+    				then
+      			systemctl stop deauther.service
+      			systemctl stop mon.service
+      			end="y"
+    			else
+      			runtime+=1
+      			clear
+    			fi
+  			done
+	fi
 
-if [ $menupick = "2341" ]
-then
-  maint
-fi
-if [ $menupick = "4132" ]
-then
-  shutdown now
-fi
+	if [ $menupick = "2341" ]
+		then
+  		maint
+	fi
 
-mainmenu
+	if [ $menupick = "4132" ]
+		then
+  			shutdown now
+	fi
+
+# mainmenu # this sort of recursion might cause you problems in the future.
 
 }
+#### End function definitions ####
 
-mainmenu
+#### running code loops ####
+
+# make sure script runs as root
+roottest
+
+# Call the init function
+init
+
+# Safer way to keep the menu as the main system
+while (1) 
+do
+	mainmenu
+done
